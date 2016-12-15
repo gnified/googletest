@@ -1,0 +1,7 @@
+group("googletest") {
+  testonly = true
+  public_deps = [
+    "googlemock",
+    "googletest",
+  ]
+}

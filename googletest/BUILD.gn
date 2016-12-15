@@ -1,0 +1,72 @@
+config("googletest_config") {
+  visibility = [ ":*" ]
+
+  defines = [
+    # In order to allow regex matches in gtest to be shared between Windows
+    # and other systems, we tell gtest to always use it's internal engine.
+    "GTEST_HAS_POSIX_RE=0",
+    "GTEST_LANG_CXX11=1",
+  ]
+
+  include_dirs = [ "include" ]
+
+  if (is_win) {
+    cflags = [ "/wd4800" ]  # Unused variable warning.
+  }
+}
+
+config("googletest_direct_config") {
+  visibility = [ ":*" ]
+  defines = [ "UNIT_TEST" ]
+}
+
+static_library("googletest") {
+  testonly = true
+  sources = [
+    "include/gtest/gtest-death-test.h",
+    "include/gtest/gtest-message.h",
+    "include/gtest/gtest-param-test.h",
+    "include/gtest/gtest-printers.h",
+    "include/gtest/gtest-spi.h",
+    "include/gtest/gtest-test-part.h",
+    "include/gtest/gtest-typed-test.h",
+    "include/gtest/gtest.h",
+    "include/gtest/gtest_pred_impl.h",
+    "include/gtest/internal/gtest-death-test-internal.h",
+    "include/gtest/internal/gtest-filepath.h",
+    "include/gtest/internal/gtest-internal.h",
+    "include/gtest/internal/gtest-linked_ptr.h",
+    "include/gtest/internal/gtest-param-util-generated.h",
+    "include/gtest/internal/gtest-param-util.h",
+    "include/gtest/internal/gtest-port.h",
+    "include/gtest/internal/gtest-port_arch.h",
+    "include/gtest/internal/gtest-string.h",
+    "include/gtest/internal/gtest-tuple.h",
+    "include/gtest/internal/gtest-type-util.h",
+
+    #"gtest/src/gtest-all.cc",  # Not needed by our build.
+    "src/gtest-death-test.cc",
+    "src/gtest-filepath.cc",
+    "src/gtest-internal-inl.h",
+    "src/gtest-port.cc",
+    "src/gtest-printers.cc",
+    "src/gtest-test-part.cc",
+    "src/gtest-typed-test.cc",
+    "src/gtest.cc",
+  ]
+
+  include_dirs = [ "." ]
+
+  all_dependent_configs = [ ":googletest_config" ]
+  public_configs = [ ":googletest_direct_config" ]
+}
+
+source_set("googletest_main") {
+  testonly = true
+  sources = [
+    "src/gtest_main.cc",
+  ]
+  deps = [
+    ":googletest",
+  ]
+}
